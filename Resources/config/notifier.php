@@ -19,8 +19,11 @@ use Symfony\Component\Notifier\Channel\DesktopChannel;
 use Symfony\Component\Notifier\Channel\EmailChannel;
 use Symfony\Component\Notifier\Channel\PushChannel;
 use Symfony\Component\Notifier\Channel\SmsChannel;
+use Symfony\Component\Notifier\Channel\PostalMailChannel;
 use Symfony\Component\Notifier\Chatter;
 use Symfony\Component\Notifier\ChatterInterface;
+use Symfony\Component\Notifier\PosterInterface;
+use Symfony\Component\Notifier\Poster;
 use Symfony\Component\Notifier\EventListener\NotificationLoggerListener;
 use Symfony\Component\Notifier\EventListener\SendFailedMessageToNotifierListener;
 use Symfony\Component\Notifier\FlashMessage\DefaultFlashMessageImportanceMapper;
@@ -28,6 +31,7 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\DesktopMessage;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Message\PostalMailMessage;
 use Symfony\Component\Notifier\Messenger\MessageHandler;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\Notifier\NotifierInterface;
@@ -82,6 +86,14 @@ return static function (ContainerConfigurator $container) {
             ->args([service('texter.transports'), service('messenger.default_bus')->ignoreOnInvalid()])
             ->tag('notifier.channel', ['channel' => 'desktop'])
 
+        // TODO register channel
+//        ->set('notifier.channel.postal_mail', PostalMailChannel::class)
+//        ->args([
+//            service('poster.transports'),
+//            abstract_arg('message bus'),
+//        ])
+//        ->tag('notifier.channel', ['channel' => 'postal_mail'])
+
         ->set('notifier.monolog_handler', NotifierHandler::class)
             ->args([service('notifier')])
 
@@ -131,6 +143,27 @@ return static function (ContainerConfigurator $container) {
         ->set('texter.messenger.push_handler', MessageHandler::class)
             ->args([service('texter.transports')])
             ->tag('messenger.message_handler', ['handles' => PushMessage::class])
+
+        // TODO register poster
+//        ->set('poster', Poster::class)
+//          ->args([
+//              service('poster.transports'),
+//              abstract_arg('message bus'),
+//              service('event_dispatcher')->ignoreOnInvalid(),
+//          ])
+//          ->alias(PosterInterface::class, 'poster')
+
+        // TODO register transport aggregate
+//        ->set('poster.transports', Transports::class)
+//          ->factory([service('poster.transport_factory'), 'fromStrings'])
+//          ->args([[]])
+//        ->set('poster.transport_factory', Transport::class)
+//          ->args([tagged_iterator('poster.transport_factory')])
+
+            // TODO register message handler
+//        ->set('poster.messenger.postal_mail_handler', MessageHandler::class)
+//            ->args([service('poster.transports')])
+//            ->tag('messenger.message_handler', ['handles' => PostalMailMessage::class])
 
         ->set('notifier.notification_logger_listener', NotificationLoggerListener::class)
             ->tag('kernel.event_subscriber')
