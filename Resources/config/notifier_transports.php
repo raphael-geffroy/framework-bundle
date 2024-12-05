@@ -135,5 +135,11 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
             ->tag('texter.transport_factory')
+        ->set('notifier.transport_factory.mysendingbox', Bridge\MySendingBox\MySendingBoxTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('poster.transport_factory')
+        ->set('notifier.transport_factory.simonthemailman', Bridge\SimonTheMailman\SimonTheMailmanTransportFactory::class)
+        ->parent('notifier.transport_factory.abstract')
+        ->tag('poster.transport_factory')
     ;
 };
