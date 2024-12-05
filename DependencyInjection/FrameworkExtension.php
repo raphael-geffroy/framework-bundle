@@ -2770,6 +2770,13 @@ class FrameworkExtension extends Extension
             $container->removeAlias(TexterInterface::class);
         }
 
+        if ($config['poster_transports']) {
+            $container->getDefinition('poster.transports')->setArgument(0, $config['poster_transports']);
+        } else {
+            $container->removeDefinition('poster');
+            $container->removeAlias(PosterInterface::class);
+        }
+
         if ($this->isInitializedConfigEnabled('mailer')) {
             $sender = $container->getDefinition('mailer.envelope_listener')->getArgument(0);
             $container->getDefinition('notifier.channel.email')->setArgument(2, $sender);
@@ -2777,7 +2784,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('notifier.channel.email');
         }
 
-        foreach (['texter', 'chatter', 'notifier.channel.chat', 'notifier.channel.email', 'notifier.channel.sms'] as $serviceId) {
+        foreach (['texter', 'chatter', 'notifier.channel.chat', 'notifier.channel.email', 'notifier.channel.sms', 'notifier.channel.postal_mail'] as $serviceId) {
             if (!$container->hasDefinition($serviceId)) {
                 continue;
             }
@@ -2802,6 +2809,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('notifier.channel.sms')->setArgument(0, null);
             $container->getDefinition('notifier.channel.push')->setArgument(0, null);
             $container->getDefinition('notifier.channel.desktop')->setArgument(0, null);
+            $container->getDefinition('notifier.channel.postal_mail')->setArgument(0, null);
         }
 
         $container->getDefinition('notifier.channel_policy')->setArgument(0, $config['channel_policy']);

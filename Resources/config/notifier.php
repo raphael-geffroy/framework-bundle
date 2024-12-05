@@ -82,6 +82,13 @@ return static function (ContainerConfigurator $container) {
             ->args([service('texter.transports'), service('messenger.default_bus')->ignoreOnInvalid()])
             ->tag('notifier.channel', ['channel' => 'desktop'])
 
+        ->set('notifier.channel.postal_mail', PostalMailChannel::class)
+        ->args([
+            service('poster.transports'),
+            abstract_arg('message bus'),
+        ])
+        ->tag('notifier.channel', ['channel' => 'postal_mail'])
+
         ->set('notifier.monolog_handler', NotifierHandler::class)
             ->args([service('notifier')])
 
@@ -131,6 +138,28 @@ return static function (ContainerConfigurator $container) {
         ->set('texter.messenger.push_handler', MessageHandler::class)
             ->args([service('texter.transports')])
             ->tag('messenger.message_handler', ['handles' => PushMessage::class])
+
+        ->set('poster', Poster::class)
+        ->args([
+            service('poster.transports'),
+            abstract_arg('message bus'),
+            service('event_dispatcher')->ignoreOnInvalid(),
+        ])
+
+        ->alias(PosterInterface::class, 'poster')
+
+        ->set('poster.transports', Transports::class)
+        ->factory([service('poster.transport_factory'), 'fromStrings'])
+        ->args([[]])
+
+        ->set('poster.transport_factory', Transport::class)
+        ->args([tagged_iterator('poster.transport_factory')])
+
+        ->set('poster.messenger.postal_mail_handler', MessageHandler::class)
+        ->args([service('poster.transports')])
+        ->tag('messenger.message_handler', ['handles' => PostalMailMessage::class])
+
+
 
         ->set('notifier.notification_logger_listener', NotificationLoggerListener::class)
             ->tag('kernel.event_subscriber')
